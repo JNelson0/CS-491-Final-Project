@@ -6,12 +6,6 @@ import unittest
 
 class TestGame(unittest.TestCase):
     
-    def test_drawGrid(self):
-        pass
-
-    def test_redrawWindow(self):
-        pass
-
     def test_randomSnack(self):
         pass
 
@@ -46,7 +40,7 @@ class TestSnake(unittest.TestCase):
         s.move((False, True, False, False))
         self.assertEqual(s.xDir, 1)
         self.assertEqual(s.yDir, 0)
-        
+
         ## TEST SNAKE MOVE UP
         s.move((False, False, True, False))
         self.assertEqual(s.xDir, 0)
