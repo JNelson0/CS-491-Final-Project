@@ -1,13 +1,20 @@
 from snake import snake
 from segment import segment
 from game import game
-import pygame
 import unittest
 
 class TestGame(unittest.TestCase):
     
     def test_randomSnack(self):
-        pass
+        g = game()
+        s = snake((1, 1, 1), (10, 10))
+        snackPosition = g.randomSnack(10, s)
+        
+        ## TEST NEW SNAKE SNACK CREATED
+        self.assertTrue(snackPosition)
+
+        ## TEST SNACK NOT IN SAME LOCATION AS SNAKE
+        self.assertNotEqual(s.head.pos, snackPosition)
 
     def test_messageBox(self):
         pass
@@ -107,11 +114,22 @@ class TestSegment(unittest.TestCase):
         seg.move(1, 0)
         self.assertEqual(seg.pos, (11, 10))
 
-    # def test_draw(self):
-    #     win = pygame.display.set_mode((500, 500))
-    #     seg = segment((10, 10), color=(0,255,0))
-    #     dis = 500 // 20
-    #     self.assertEqual(seg.draw(win), pygame.draw.rect(win, seg.color, (10*dis+1,10*dis+1, dis-2, dis-2)))
+class IntegrationTest(unittest.TestCase):
+    
+    def test(self):
+        pass
+
+    def test(self):
+        pass
+
+    def test(self):
+        pass
+
+    def test(self):
+        pass
+
+    def test(self):
+        pass
 
 if __name__ == '__main__':
     unittest.main()
