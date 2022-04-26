@@ -13,11 +13,11 @@ jobs:
               with:
                   python-version: 3.8
             - name: Install Dependencies
-            - run: pip install -r requirements.txt
+              run: pip install -r requirements.txt
             - name: Run unittests
-            - run: coverage run testing.py
+              run: coverage run testing.py
             - name: Output Coverage Report
-            - run: coverage report
+              run: coverage report
 
     deploy:
         runs-on: ubuntu-latest
