@@ -3,6 +3,8 @@ name: CI_CD
 on:
     push:
         branches: [master]
+    pull-request:
+        branches: [master]
 
 jobs:
     build:
@@ -14,7 +16,7 @@ jobs:
                   python-version: 3.8
             - name: Install Dependencies
               run: pip install -r requirements.txt
-            - name: Run unittests
+            - name: Run unittests and integration tests
               run: coverage run testing.py
             - name: Output Coverage Report
               run: coverage report

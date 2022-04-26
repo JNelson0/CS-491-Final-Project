@@ -223,8 +223,21 @@ class IntegrationTest(unittest.TestCase):
         s.body.parts.append(segment((20, 10)))
         self.assertTrue(g.checkLoss(s))
 
-    def test(self):
-        pass
+    ##### INTEGRATION TEST FOR INITIALIZING START SNAKE AT START OF GAME
+    ### snake __init__() -> body __init__() -> segment __init__()
+    ## snake class intializes direction color and body containing list of segments 
+    ## body initializes the head of the snake and contains all body segments 
+    ## segment is initialized as the head of the snake
+    def test_Initialize(self):
+        ### Snake gets initialized which creates body and segment
+        s = snake((1, 1, 1), (15, 15))
+
+        ### TEST BODY CREATED
+        self.assertEqual(s.body.parts[0].pos, (15, 15))
+
+        ### TEST SEGMENT WAS CREATED AND ASSIGNED AS SNAKE HEAD
+        self.assertEqual(s.body.head.pos, (15, 15))
+
 
 if __name__ == '__main__':
     unittest.main()

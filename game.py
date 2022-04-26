@@ -90,7 +90,7 @@ class game:
 
             if self.checkLoss(s):
                 print('Score: ', len(s.body.parts))
-                self.messageBox('You Lost!', 'Play again...')
+                self.messageBox('You Lost!', 'Your Score: {}'.format(len(s.body.parts)))
                 s.reset((10,10))
                 
             self.redrawWindow(win)
