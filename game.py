@@ -32,7 +32,7 @@ class game:
 
     def randomSnack(self, rows, item):
 
-        positions = item.body
+        positions = item.body.parts
 
         while True:
             x = random.randrange(rows)
@@ -55,7 +55,14 @@ class game:
         except:
             pass
 
+    def snakeSnack(self, snake):
+        snake.addToSnake()
 
+    def getSnakeHead(self, snake):
+        return snake.getSnakeHead()
+    
+    def checkLoss(self, snake):
+        return snake.checkSnake()
 
     def play(self):
         global width, rows, s, snack
@@ -64,28 +71,27 @@ class game:
         win = pygame.display.set_mode((width, width))
         s = snake((255,0,0), (10,10))
         snack = segment(self.randomSnack(rows, s), color=(0,255,0))
-        flag = True
 
         clock = pygame.time.Clock()
         
+        flag = True
         while flag:
             pygame.time.delay(50)
             clock.tick(8)
             for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
                 keys = pygame.key.get_pressed()
             s.move((keys[pygame.K_LEFT], keys[pygame.K_RIGHT], keys[pygame.K_UP], keys[pygame.K_DOWN]))
             
-            if s.body[0].pos == snack.pos:
-                s.addCube()
+            if self.getSnakeHead(s).pos == snack.pos:
+                self.snakeSnack(s)
                 snack = segment(self.randomSnack(rows, s), color=(0,255,0))
 
-            for x in range(len(s.body)):
-                if s.body[x].pos in list(map(lambda z:z.pos,s.body[x+1:])):
-                    print('Score: ', len(s.body))
-                    self.messageBox('You Lost!', 'Play again...')
-                    s.reset((10,10))
-                    break
-
+            if self.checkLoss(s):
+                print('Score: ', len(s.body.parts))
+                self.messageBox('You Lost!', 'Play again...')
+                s.reset((10,10))
                 
             self.redrawWindow(win)
 

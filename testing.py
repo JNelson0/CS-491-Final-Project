@@ -1,6 +1,10 @@
 from snake import snake
+from body import body
 from segment import segment
 from game import game
+
+import pygame
+
 import unittest
 
 class TestGame(unittest.TestCase):
@@ -14,13 +18,8 @@ class TestGame(unittest.TestCase):
         self.assertTrue(snackPosition)
 
         ## TEST SNACK NOT IN SAME LOCATION AS SNAKE
-        self.assertNotEqual(s.head.pos, snackPosition)
+        self.assertNotEqual(s.body.head.pos, snackPosition)
 
-    def test_messageBox(self):
-        pass
-
-    def test_play(self):
-        pass
 
 class TestSnake(unittest.TestCase):
     
@@ -33,7 +32,7 @@ class TestSnake(unittest.TestCase):
 
         ## TEST SNAKE START POSITION
         segmentHead =  segment((10, 10))
-        self.assertEqual(s.head.pos, segmentHead.pos)
+        self.assertEqual(s.body.head.pos, segmentHead.pos)
 
     def test_move(self):
         s = snake((1, 1, 1), (10, 10))
@@ -62,7 +61,7 @@ class TestSnake(unittest.TestCase):
         s = snake((1, 1, 1), (14, 23))
         s.xDir = -1
         s.yDir = 0
-        s.body = [segment(14, 22), segment(14, 21)]
+        s.body.parts = [segment(14, 22), segment(14, 21)]
         s.reset((10, 10))
 
         ## TEST RESET FOR SNAKE X DIRECTION
@@ -71,36 +70,59 @@ class TestSnake(unittest.TestCase):
         self.assertEqual(s.yDir, 1)
         ## TEST RESET FOR SNAKE BODY
         headReset = segment((10, 10))
-        self.assertEqual(s.body[0].pos, headReset.pos)
+        self.assertEqual(s.body.parts[0].pos, headReset.pos)
 
-    def test_addCube(self):
-        s = snake((1, 1, 1), (10, 10))
 
-        ## TEST ADDING SEGMENT LEFT OF SNAKE
-        s.xDir, s.yDir = 1, 0
-        s.addCube()
-        self.assertEqual(s.body[-1].pos, (9, 10))
-        s.reset((10, 10))
-
-        ## TEST ADDING SEGMENT RIGHT OF SNAKE
-        s.xDir, s.yDir = -1, 0
-        s.addCube()
-        self.assertEqual(s.body[-1].pos, (11, 10))
-        s.reset((10, 10))
-
-        ## TEST ADDING SEGMENT DOWN OF SNAKE
-        s.xDir, s.yDir = 0, 1
-        s.addCube()
-        self.assertEqual(s.body[-1].pos, (10, 9))
-        s.reset((10, 10))
-
-        ## TEST ADDING SEGMENT UP OF SNAKE
-        s.xDir, s.yDir = 0, -1
-        s.addCube()
-        self.assertEqual(s.body[-1].pos, (10, 11))
-
-    def test_draw(self):
+    def test_checkSnake(self):
         pass
+
+
+class TestBody(unittest.TestCase):
+    
+    def test_init(self):
+        b = body((10, 10))
+        self.assertEqual(b.parts[0].pos, (10, 10))
+
+    def test_addBodySegment(self):
+        b = body((10, 10))
+        b.addBodySegment(segment((b.parts[-1].pos[0] - 1, b.parts[-1].pos[1])))
+        self.assertEqual(b.parts[1].pos, (9, 10))
+
+    def test_moveBodyParts(self):
+        pass
+
+    def test_checkBodyParts(self):
+        b = body((10, 10))
+        b.xDir, b.yDir = 1, 0
+        ## TEST FOR OUT OF RANGE SNAKE RIGHT
+        b.parts.append(segment((20, 10)))
+        self.assertTrue(b.checkBodyParts())
+
+        b.xDir, b.yDir = 0, 1
+        ## TEST FOR OUT OF RANGE SNAKE DOWN
+        b.parts.append(segment((10, 20)))
+        self.assertTrue(b.checkBodyParts())
+
+        b.xDir, b.yDir = -1, 0
+        ## TEST FOR OUT OF RANGE SNAKE LEFT
+        b.parts.append(segment((-1, 10)))
+        self.assertTrue(b.checkBodyParts())
+
+        b.xDir, b.yDir = 0, -1        
+        ## TEST FOR OUT OF RANGE SNAKE UP
+        b.parts.append(segment((10, -1)))
+        self.assertTrue(b.checkBodyParts())
+
+        b = body((10, 10))
+        self.assertFalse(b.checkBodyParts())
+        
+    def test_getBodyHead(self):
+        b = body((10, 10))
+        ## TEST HEAD MATCHES RETURN VALUE
+        self.assertEqual(b.getBodyHead(), b.head)
+
+        ## TEST EXPECTED HEAD POS
+        self.assertEqual(b.getBodyHead().pos, (10, 10))
 
 class TestSegment(unittest.TestCase):
     
@@ -116,17 +138,90 @@ class TestSegment(unittest.TestCase):
 
 class IntegrationTest(unittest.TestCase):
     
-    def test(self):
-        pass
+    ##### INTEGRATION TEST FOR ADDING NEW BODY PART TO SNAKE
+    ### snake.addToSnake() -> body.addBodySegment()
+    def test_addToSnake(self):
+        s = snake((1, 1, 1), (10, 10))
 
-    def test(self):
-        pass
+        ## TEST ADDING SEGMENT LEFT OF SNAKE
+        s.xDir, s.yDir = 1, 0
+        s.addToSnake()
+        self.assertEqual(s.body.parts[-1].pos, (9, 10))
+        s.reset((10, 10))
 
-    def test(self):
-        pass
+        ## TEST ADDING SEGMENT RIGHT OF SNAKE
+        s.xDir, s.yDir = -1, 0
+        s.addToSnake()
+        self.assertEqual(s.body.parts[-1].pos, (11, 10))
+        s.reset((10, 10))
 
-    def test(self):
-        pass
+        ## TEST ADDING SEGMENT DOWN OF SNAKE
+        s.xDir, s.yDir = 0, 1
+        s.addToSnake()
+        self.assertEqual(s.body.parts[-1].pos, (10, 9))
+        s.reset((10, 10))
+
+        ## TEST ADDING SEGMENT UP OF SNAKE
+        s.xDir, s.yDir = 0, -1
+        s.addToSnake()
+        self.assertEqual(s.body.parts[-1].pos, (10, 11))
+
+    ##### INTEGRATION TEST FOR RETRIEVING SNAKE HEAD POSITION
+    ### game getSnakeHead() -> snake getSnakeHead() -> body getBodyHead()
+    def test_getSnakeHead(self):
+        g = game()
+        s = snake((1, 1, 1), (10, 10))
+
+        ## TEST CORRECT SNAKE HEAD OBJECT RETURNED
+        self.assertEqual(g.getSnakeHead(s), s.body.head)
+
+        ## TEST POSITION OF RETRIEVED SNAKE HEAD IS CORRECT
+        self.assertEqual(g.getSnakeHead(s).pos, (10, 10))
+
+    ##### INTEGRATION TEST FOR ADDING SEGMENT TO SNAKE BODY
+    ### game snakeSnack() -> snake addToSnake() -> body addBodySegment()
+    def test_snakeSnack(self):
+        g = game()
+        s = snake((1, 1, 1), (10, 10))
+
+        ## TEST ADDING SEGMENT TO SNAKE LEFT
+        s.xDir, s.yDir = 1, 0
+        g.snakeSnack(s)
+        self.assertEqual(s.body.parts[-1].pos, (9, 10))
+        s.reset((10, 10))
+
+        ## TEST ADDING SEGMENT TO SNAKE RIGHT
+        s.xDir, s.yDir = -1, 0
+        g.snakeSnack(s)
+        self.assertEqual(s.body.parts[-1].pos, (11, 10))
+        s.reset((10, 10))
+
+        ## TEST ADDING SEGMENT TO SNAKE DOWN
+        s.xDir, s.yDir = 0, 1
+        g.snakeSnack(s)
+        self.assertEqual(s.body.parts[-1].pos, (10, 9))
+        s.reset((10, 10))
+
+        ## TEST ADDING SEGMENT TO SNAKE UP
+        s.xDir, s.yDir = 0, -1
+        g.snakeSnack(s)
+        self.assertEqual(s.body.parts[-1].pos, (10, 11))
+
+    ##### INTEGRATION TEST TO CHECK IF SNAKE IS EITHER OUT OF BOUNDS OR IF THE SNAKE HITS ITS OWN BODY SEGMENT
+    ### game checkLoss() -> snake checkSnake -> body checkBodyParts()
+    def test_checkLoss(self):
+        g = game()
+        s = snake((1, 1, 1), (10, 10))
+        g.snakeSnack(s)
+
+        ## TEST IF SNAKE IS IN BOUNDS AND NOT HITTING ANOTHER SEGMENT
+        self.assertFalse(g.checkLoss(s))
+
+        ## TEST IF SNAKE IS OUT OF BOUNDS (LOSE GAME)
+        ## TEST FOR OUT OF RANGE SNAKE DOWN
+        s.xDir, s.yDir = 0, 1
+        s.body.parts.append(segment((20, 10)))
+        self.assertTrue(g.checkLoss(s))
 
     def test(self):
         pass
