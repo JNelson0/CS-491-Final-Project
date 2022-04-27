@@ -5,9 +5,9 @@ Snake Game is a single player game where the snake is controlled by a player.  W
 ## Automated CI/CD
 Testing, Coverage, and Deployment for Snake Game is handled by Github, Github Actions, and Docker.
 - Navigate to the [Actions](https://github.com/JNelson0/CS-491-Final-Project/actions) tab inside of repository.
-- Click on action to view build and deployment
-- - build shows all testing and coverage
-- - deploy shows build and push for docker image
+- Click on any completed action to view build and deployment
+  - build shows steps for testing and coverage reports
+  - deploy shows steps of building and pushing for docker image creation
 ## Manual Running Instructions
 Below is a list of running instructions to clone and run Snake Game locally.
 
