@@ -9,6 +9,10 @@ Clone Repository:
 ```bash
 git clone https://github.com/JNelson0/CS-491-Final-Project.git
 ```
+Install needed python dependencies:
+```bash
+pip install -r requirements.txt
+```
 Run Snake Game:
 ```bash
 python main.py
